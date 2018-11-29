@@ -35,7 +35,8 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
-      '@': resolve('src'),
+      '@': resolve('src')
+      // 'styles': resolve('src/styles')// 此处为添加内容
     }
   },
   module: {
@@ -75,6 +76,16 @@ module.exports = {
           name: utils.assetsPath('fonts/[name].[hash:7].[ext]')
         }
       }
+      // {
+      //   test: /\.scss$/,
+      //   use: [{
+      //     loader: 'style-loader'
+      //   }, {
+      //     loader: 'css-loader'
+      //   }, {
+      //     loader: 'sass-loader'
+      //   }]
+      // }
     ]
   },
   node: {

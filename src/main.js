@@ -9,7 +9,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
 // 引入index.scss
-import './styles/index.scss'
+import '@/styles/index.css'
 
 // 使用element
 Vue.use(ElementUI)
