@@ -45,8 +45,8 @@ export default {
   data () {
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: '123456'
       },
       rules: {
         username: [
@@ -66,7 +66,10 @@ export default {
           login(this.loginForm).then(results => {
             // console.log(results)
             if (results.meta.status === 200) {
-              // 跳转
+              // 登录成功的时候 实现本地存储token值
+              localStorage.setItem('admin_token', results.data.token)
+              // 跳转 编程式的导航---跳转路由
+              this.$router.push({name: 'Home'})
             } else {
               // 提示用户失败信息
               this.$message.error(results.meta.msg)

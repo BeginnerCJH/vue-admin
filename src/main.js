@@ -18,6 +18,19 @@ Vue.use(ElementUI)
 
 Vue.config.productionTip = false
 
+// 导航守卫---三个参数 to到哪里去  from从哪里来 next()下一个钩子函数
+router.beforeEach((to, from, next) => {
+  // 获取token值
+  var token = localStorage.getItem('admin_token')
+  // 判断是否存在token值 或者页面是否处于登录页
+  if (token || to.path === '/login') {
+    next()
+  } else {
+    // 跳转回登录页
+    next({path: '/login'})
+  }
+})
+
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
