@@ -8,8 +8,10 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
-// 引入index.scss
-import '@/styles/index.css'
+// 引入index.css
+import '@/styles/index.scss'
+// 引入按钮的样式
+// import '../static/buttons.css'
 
 // 使用element
 Vue.use(ElementUI)
