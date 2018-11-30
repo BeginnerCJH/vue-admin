@@ -1,13 +1,15 @@
 <template>
   <div class="home">
     <el-container>
-      <el-aside width="200px">
+      <el-aside width="auto">
+        <router-link to="/home">
         <div class="logo"></div>
+        </router-link>
         <el-row class="tac">
           <el-col :span="12">
             <el-menu
               default-active="2"
-              class="el-menu-admin"
+              class="el-menu-vertical-demo el-menu-admin"
               @open="handleOpen"
               @close="handleClose"
               background-color="#545c64"
@@ -22,7 +24,7 @@
                   <i class="el-icon-location"></i>
                   <span>用户管理</span>
                 </template>
-                <el-menu-item index="1-1">
+                <el-menu-item index="users">
                   <i class="el-icon-menu"></i>
                   <span slot="title">用户列表</span>
                 </el-menu-item>
@@ -89,30 +91,29 @@
       </el-aside>
       <el-container>
         <el-header>
-          <div class="toggle-btn">
-            <!-- <el-radio-group
-              v-model="isCollapse"
-              style="margin-bottom: 20px;"
-            >
-              <el-radio-button :label="false">展开</el-radio-button>
-              <el-radio-button :label="true">收起</el-radio-button>
-            </el-radio-group> -->
-            <span
-              class="myicon myicon-menu"
-              @click="isCollapse=!isCollapse"
-            ></span>
-          </div>
-
+          <span
+            class="toggle-btn myicon myicon-menu"
+            @click="isCollapse=!isCollapse"
+          ></span>
           <div class="system-title">
             <span>陈十一后台管理系统</span>
           </div>
-          <div class="user">
-            <span>你好：</span>
+          <div class="welcome">
+            <span>欢迎你：</span>
+            <img
+              src="../assets/aaa.png"
+              alt=""
+              width="30px"
+            >
             <span>陈十一</span>
             <button>退出</button>
           </div>
         </el-header>
-        <el-main>欢迎使用后台管理系统！！！</el-main>
+        <el-main>
+          <router-view>
+
+          </router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -138,6 +139,7 @@ export default {
       console.log(key, keyPath)
     }
   }
+
 }
 </script>
 
@@ -165,7 +167,7 @@ export default {
   }
   .logo {
     height: 60px;
-    background: url(../assets/logo.png);
+    background: url(../assets/ju.png);
     background-size: cover;
     background-color: #fff;
   }
@@ -180,12 +182,16 @@ export default {
       background-color: #4292cf;
     }
   }
+
   .system-title {
     font-size: 28px;
     color: white;
   }
   .welcome {
     color: white;
+    img {
+      vertical-align: middle;
+    }
   }
 }
 </style>
