@@ -43,3 +43,48 @@ export const getUserList = (params) => {
     return results.data
   })
 }
+
+// 添加用户的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const addUser = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.post('users', params).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 修改用户状态的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const changeUserStatus = (uid, type) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.put(`users/${uid}/state/${type}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 根据id查找用户信息的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const findUserById = (uid) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get(`users/${uid}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 编辑户信息的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const editUser = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.put(`users/${params.id}`, params).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 删除用户信息的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const deleteUser = (uid) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.delete(`users/${uid}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
