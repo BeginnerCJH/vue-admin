@@ -272,10 +272,21 @@
               v-model="permissionform.username"
               :disabled="true"
               style="width:auto"
-
             ></el-input>
           </el-form-item>
-
+          <el-form-item label="角色">
+            <el-select
+              v-model="permissionform.rid"
+              placeholder="请选择权限"
+            >
+              <el-option
+                v-for="(values,index) in permission"
+                :key="index"
+                :label="values.roleName"
+                :value="values.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
         </el-form>
         <div
           slot="footer"
@@ -297,9 +308,10 @@ import {
   getUserList,
   addUser,
   changeUserStatus,
-  findUserById,
   editUser,
-  deleteUser
+  deleteUser,
+  getRoles,
+  allotRoles
 } from '@/api'
 export default {
   data () {
@@ -321,8 +333,11 @@ export default {
       // 赋值权限用户的信息
       permissionform: {
         id: '',
+        rid: '',
         username: ''
       },
+      // 角色列表信息
+      permission: [],
       // 是否显示编辑对话框 默认是false
       editdialogFormVisible: false,
       //   编辑用户的信息
@@ -371,7 +386,32 @@ export default {
   methods: {
     //   点击赋值权限
     submitpermissionform () {
-
+      // 判断用户是否选择角色
+      if (!this.permissionform.rid) {
+        this.$message({
+          message: '请选择角色，否者无法提交',
+          type: 'warning'
+        })
+        return
+      }
+      allotRoles(this.permissionform).then(results => {
+        // console.log(results)
+        if (results.meta.status === 200) {
+          // 提示用户修改成功
+          this.$message({
+            message: results.meta.msg,
+            type: 'success'
+          })
+          // 隐藏模态框
+          this.permissiondialogFormVisible = false
+        } else {
+          // 提示用户修改失败
+          this.$message({
+            message: results.meta.msg,
+            type: 'error'
+          })
+        }
+      })
     },
     //   点击编辑用户---修改数据
     submiteditform (formname) {
@@ -489,21 +529,15 @@ export default {
       this.editdialogFormVisible = true
       //   获取用户的id查询当前的用户数据
       this.editform.id = row.id
-      //   console.log(uid)
-      findUserById(this.editform.id).then(results => {
-        console.log(results)
-        if (results.meta.status === 200) {
-          this.editform.username = results.data.username
-          this.editform.email = results.data.email
-          this.editform.mobile = results.data.mobile
-        }
-      })
+      this.editform.username = row.username
+      this.editform.email = row.email
+      this.editform.mobile = row.mobile
     },
     // 删除用户的按钮
     handleDelete (index, row) {
       console.log(index, row)
       this.$confirm(
-        `此操作将永久删除id号为${row.id}的用户, 是否继续?`,
+        `此操作将永久删除用户名为${row.username}的用户, 是否继续?`,
         '提示',
         {
           confirmButtonText: '确定',
@@ -515,15 +549,22 @@ export default {
           //   确定的回调函数
           // 发送请求 删除用户信息
           deleteUser(row.id).then(results => {
-            console.log(results)
+            // console.log(results)
+            // 提示用户
+            if (results.meta.status === 200) {
+              this.$message({
+                type: 'success',
+                message: results.meta.msg
+              })
+              // 重新渲染页面数据
+              this.init()
+            } else {
+              this.$message({
+                type: 'error',
+                message: results.meta.msg
+              })
+            }
           })
-          // 提示用户
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
-          // 重新渲染页面数据
-          this.init()
         })
         .catch(() => {
           this.$message({
@@ -538,12 +579,11 @@ export default {
       this.permissiondialogFormVisible = true
       //   获取用户的id查询当前的用户数据
       this.permissionform.id = row.id
-      //   console.log(uid)
-      findUserById(this.permissionform.id).then(results => {
-        // console.log(results)
-        if (results.meta.status === 200) {
-          this.permissionform.username = results.data.username
-        }
+      this.permissionform.username = row.username
+      // 获取角色的列表信息
+      getRoles().then(results => {
+        // console.log(results.data)
+        this.permission = results.data
       })
     },
     // 改变用户状态

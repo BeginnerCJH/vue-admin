@@ -88,3 +88,57 @@ export const deleteUser = (uid) => {
     return results.data
   })
 }
+
+// 获取角色列表的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const getRoles = () => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get(`roles`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 分配角色的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const allotRoles = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.put(`users/${params.id}/role`, {rid: params.rid}).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 添加角色的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const addRoles = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.post(`roles`, params).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 编辑角色的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const editRoles = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.put(`roles/${params.id}`, params).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 删除角色的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const deleteRoles = (uid) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.delete(`roles/${uid}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 获取用户列表的接口----是一个常量函数 export暴露出去 供外部使用
+export const getGoodList = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get('goods', {params: params}).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
