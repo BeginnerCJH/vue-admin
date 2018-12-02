@@ -133,8 +133,23 @@ export const deleteRoles = (uid) => {
     return results.data
   })
 }
-
+// 删除角色指定权限的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const deleteRolesRights = (roleId, rightId) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.delete(`roles/${roleId}/rights/${rightId}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
 // 获取用户列表的接口----是一个常量函数 export暴露出去 供外部使用
+export const getRightsList = (type) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get(`rights/${type}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+// 获取商品列表的接口----是一个常量函数 export暴露出去 供外部使用
 export const getGoodList = (params) => {
   // 通过return可以返回一个promise对象 它里面有一个方法是.then
   return axios.get('goods', {params: params}).then(results => {

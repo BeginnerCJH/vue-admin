@@ -389,12 +389,14 @@ export default {
     submitpermissionform () {
       // 判断用户是否选择角色
       if (!this.permissionform.rid) {
+        // 提示用户
         this.$message({
           message: '请选择角色，否者无法提交',
           type: 'warning'
         })
         return
       }
+      // 发送请求---向服务器提交数据
       allotRoles(this.permissionform).then(results => {
         // console.log(results)
         if (results.meta.status === 200) {
@@ -577,22 +579,33 @@ export default {
     // 赋值权限的按钮
     handlePermission (index, row) {
       console.log(index, row)
+      // 显示模态框
       this.permissiondialogFormVisible = true
       //   获取用户的id查询当前的用户数据
       this.permissionform.id = row.id
       this.permissionform.username = row.username
-      findUserById(this.permissionform.id).then(results => {
-        if (results.meta.status === 200) {
-          this.permissionform.rid = results.data.rid
-        }
-      })
+
       // 获取角色的列表信息
       getRoles().then(results => {
         // console.log(results.data)
-        this.permission = results.data
+        if (results.meta.status === 200) {
+          this.permission = results.data
+          // 根据用户id去获取角色的id
+          findUserById(this.permissionform.id).then(results => {
+            if (results.meta.status === 200) {
+              if (results.data.rid === 0) {
+                this.permissionform.rid = '超级管理员'
+              } else if (results.data.rid === -1) {
+
+              } else {
+                this.permissionform.rid = results.data.rid
+              }
+            }
+          })
+        }
       })
     },
-    // 改变用户状态
+    // 动态获取每页要显示的条数
     handleSizeChange (val) {
       console.log(`每页 ${val} 条`)
       //   动态赋值每页要显示的条数
@@ -600,6 +613,7 @@ export default {
       //   重新渲染数据
       this.init()
     },
+    // 动态获取当前页数
     handleCurrentChange (val) {
       console.log(`当前页: ${val}`)
       //   时时获取当前页码

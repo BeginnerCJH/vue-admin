@@ -26,43 +26,6 @@
         <el-table-column type="expand">
           <template slot-scope="props">
             <el-row
-              v-if="props.row.children.length!==0"
-              :gutter="20"
-              v-for="(value,index) in props.row.children"
-              :key="index"
-            >
-              <el-col :span="2">
-                <div class="one">{{value.authName}}</div>
-              </el-col>
-              <el-col
-                :span="20"
-                :offset="2"
-              >
-                <el-row
-                  :gutter="20"
-                  v-for="(value2,index2) in value.children"
-                  :key="index2"
-                >
-                  <el-col :span="2">
-                    <div class="two">{{value2.authName}}</div>
-                  </el-col>
-                  <el-col
-                    :span="18"
-                    :offset="2"
-                  >
-                    <el-col
-                      :span="3"
-                      v-for="(value3,index3) in value2.children"
-                      :key="index3"
-                    >
-                      <div class="three">{{value3.authName}}</div>
-                    </el-col>
-
-                  </el-col>
-                </el-row>
-              </el-col>
-            </el-row>
-            <el-row
               v-if="props.row.children.length===0"
               :gutter="20"
             >
@@ -72,6 +35,58 @@
                 </div>
               </el-col>
             </el-row>
+            <el-row
+              v-else
+              :gutter="20"
+              v-for="(value,index) in props.row.children"
+              :key="index"
+            >
+              <el-col :span="4">
+                <el-tag
+                  :key="index"
+                  closable
+                  type="success"
+                  @close='close(props.row,value.id)'
+                >
+                  {{value.authName}}
+                </el-tag>
+                <span class="el-icon-arrow-right"></span>
+
+              </el-col>
+              <el-col :span="20">
+                <el-row
+                  :gutter="20"
+                  v-for="(value2,index2) in value.children"
+                  :key="index2"
+                >
+                  <el-col :span="4">
+                    <el-tag
+                      closable
+                      type=""
+                      @close='close(props.row,value2.id)'
+                    >
+                      {{value2.authName}}
+
+                    </el-tag>
+                    <span class="el-icon-arrow-right"></span>
+                  </el-col>
+                  <el-col :span="20">
+                    <el-tag
+                      v-for="(value3,index3) in value2.children"
+                      :key="index3"
+                      closable
+                      type="warning"
+                      @close='close(props.row,value3.id)'
+                      style="margin-left:10px"
+                    >
+                      {{value3.authName}}
+                    </el-tag>
+
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+
           </template>
         </el-table-column>
         <el-table-column type="index">
@@ -222,17 +237,23 @@
         title="授权角色"
         :visible.sync="authorizationdialogFormVisible"
       >
-      <!-- tree树 -->
-        <el-tree
-            :data="data2"
+        <!-- tree树 -->
+        <el-scrollbar style="height:100%">
+          <el-tree
+            :data="rolesData"
             show-checkbox
             default-expand-all
             node-key="id"
             ref="tree"
+            :default-checked-keys="checkedKeys"
             highlight-current
             :props="defaultProps"
+            style="height:500px"
           >
+
           </el-tree>
+        </el-scrollbar>
+
         <div
           slot="footer"
           class="dialog-footer"
@@ -249,48 +270,24 @@
 </template>
 
 <script>
-import { getRoles, addRoles, editRoles, deleteRoles } from '@/api'
+import {
+  getRoles,
+  addRoles,
+  editRoles,
+  deleteRoles,
+  getRightsList,
+  deleteRolesRights
+} from '@/api'
 export default {
   data () {
     return {
-      data2: [{
-        id: 1,
-        label: '一级 1',
-        children: [{
-          id: 4,
-          label: '二级 1-1',
-          children: [{
-            id: 9,
-            label: '三级 1-1-1'
-          }, {
-            id: 10,
-            label: '三级 1-1-2'
-          }]
-        }]
-      }, {
-        id: 2,
-        label: '一级 2',
-        children: [{
-          id: 5,
-          label: '二级 2-1'
-        }, {
-          id: 6,
-          label: '二级 2-2'
-        }]
-      }, {
-        id: 3,
-        label: '一级 3',
-        children: [{
-          id: 7,
-          label: '二级 3-1'
-        }, {
-          id: 8,
-          label: '二级 3-2'
-        }]
-      }],
+      // 角色数据
+      rolesData: [],
+      // 选中权限数据
+      checkedKeys: [],
       defaultProps: {
         children: 'children',
-        label: 'label'
+        label: 'authName'
       },
       // 模态框 默认不显示
       authorizationdialogFormVisible: false,
@@ -326,6 +323,27 @@ export default {
     }
   },
   methods: {
+    // 删除角色指定的权限
+    close (row, rightId) {
+      // console.log('啊 我死了' + roleId, rightId)
+      deleteRolesRights(row.id, rightId).then(results => {
+        // console.log(results)
+        if (results.meta.status === 200) {
+          // 提示用户
+          this.$message({
+            type: 'success',
+            message: results.meta.msg
+          })
+          // 重新替换数据
+          row.children = results.data
+        } else {
+          this.$message({
+            type: 'error',
+            message: results.meta.msg
+          })
+        }
+      })
+    },
     //   编辑数据提交
     submiteditform (formname) {
       // 验证用户是否正确输入表单内容
@@ -455,6 +473,25 @@ export default {
       console.log(index, row)
       //   显示模态框
       this.authorizationdialogFormVisible = true
+      getRightsList('tree').then(results => {
+        // console.log(results)
+        if (results.meta.status === 200) {
+          this.rolesData = results.data
+        }
+      })
+      // 先清除上次的id号
+      this.checkedKeys.length = 0
+      row.children.forEach(first => {
+        if (first.children && first.children.length !== 0) {
+          first.children.forEach(second => {
+            if (second.children && first.children.second !== 0) {
+              second.children.forEach(third => {
+                this.checkedKeys.push(third.id)
+              })
+            }
+          })
+        }
+      })
     }
   },
   mounted () {
@@ -472,8 +509,6 @@ export default {
 }
 .el-col {
   border-radius: 4px;
-  //   text-align: center;
-  //   line-height: 45px;
 }
 .bg-purple-dark {
   background: #99a9bf;

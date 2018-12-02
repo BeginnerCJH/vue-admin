@@ -10,7 +10,7 @@
     <!-- 权限列表数据展示 -->
     <template>
       <el-table
-        :data="tableData3"
+        :data="rightsList"
         border
         style="width: 100%"
       >
@@ -20,23 +20,29 @@
         >
         </el-table-column>
         <el-table-column
-          prop="date"
+          prop="authName"
           label="权限"
           width="180"
         >
         </el-table-column>
         <el-table-column
-          prop="name"
+          prop="path"
           label="路径"
           width="180"
         >
         </el-table-column>
+
         <el-table-column
-          prop="address"
+          prop="level"
           label="层级"
           width="100"
         >
+        <!--插槽 自定义模板 -->
+          <template slot-scope="scope">
+              <span>{{scope.row.level | levels}}</span>
+          </template>
         </el-table-column>
+
       </el-table>
     </template>
   </div>
@@ -44,46 +50,36 @@
 </template>
 
 <script>
+import { getRightsList } from '@/api'
 export default {
   data () {
     return {
-      tableData3: [
-        {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          date: '2016-05-08',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          date: '2016-05-06',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        },
-        {
-          date: '2016-05-07',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }
-      ]
+      rightsList: []
+    }
+  },
+  mounted () {
+    getRightsList('list').then(results => {
+      console.log(results)
+      if (results.meta.status === 200) {
+        this.rightsList = results.data
+      }
+    })
+  },
+  methods: {
+    hd (row) {
+      console.log(row)
+    }
+  },
+  // 过滤器
+  filters: {
+    levels: function (value) {
+      if (value === '0') {
+        return '一级'
+      } else if (value === '1') {
+        return '二级'
+      } else if (value === '2') {
+        return '三级'
+      }
     }
   }
 }
