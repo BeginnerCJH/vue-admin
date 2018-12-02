@@ -68,15 +68,23 @@
             width="180"
           >
             <template slot-scope="scope">
+              <el-tooltip class="item" effect="dark" content="编辑" placement="top">
               <el-button
                 size="mini"
                 @click="handleEdit(scope.$index, scope.row)"
-              >编辑</el-button>
+                icon="el-icon-edit"
+                type="primary" plain
+              ></el-button>
+              </el-tooltip>
+              <el-tooltip class="item" effect="dark" content="删除" placement="top">
               <el-button
                 size="mini"
                 type="danger"
+                plain
+                icon="el-icon-delete"
                 @click="handleDelete(scope.$index, scope.row)"
-              >删除</el-button>
+              ></el-button>
+              </el-tooltip>
             </template>
           </el-table-column>
         </el-table>

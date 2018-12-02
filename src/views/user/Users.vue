@@ -311,7 +311,8 @@ import {
   editUser,
   deleteUser,
   getRoles,
-  allotRoles
+  allotRoles,
+  findUserById
 } from '@/api'
 export default {
   data () {
@@ -580,6 +581,11 @@ export default {
       //   获取用户的id查询当前的用户数据
       this.permissionform.id = row.id
       this.permissionform.username = row.username
+      findUserById(this.permissionform.id).then(results => {
+        if (results.meta.status === 200) {
+          this.permissionform.rid = results.data.rid
+        }
+      })
       // 获取角色的列表信息
       getRoles().then(results => {
         // console.log(results.data)

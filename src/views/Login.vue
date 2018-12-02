@@ -64,10 +64,12 @@ export default {
         if (valid) {
           // 调用接口，发送请求----返回的结果是promise对象 可以.then
           login(this.loginForm).then(results => {
-            // console.log(results)
+            console.log(results)
             if (results.meta.status === 200) {
               // 登录成功的时候 实现本地存储token值
               localStorage.setItem('admin_token', results.data.token)
+              // 存储id
+              localStorage.setItem('admin_id', results.data.id)
               // 跳转 编程式的导航---跳转路由
               this.$router.push({name: 'Home'})
             } else {

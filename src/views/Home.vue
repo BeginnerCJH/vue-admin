@@ -3,12 +3,13 @@
     <el-container>
       <el-aside width="auto">
         <router-link to="/home">
-        <div class="logo"></div>
+          <div class="logo"></div>
         </router-link>
         <el-row class="tac">
           <el-col :span="12">
             <el-menu
-              default-active="2"
+              :default-active="defaultUrl"
+              ref="menu"
               class="el-menu-vertical-demo el-menu-admin"
               @open="handleOpen"
               @close="handleClose"
@@ -19,18 +20,24 @@
               :unique-opened="true"
               :router="true"
             >
-              <el-submenu index="1">
+              <el-submenu
+              v-for="(value,indexs) in submenu"
+              :key="indexs"
+              :index="value.index">
                 <template slot="title">
                   <i class="el-icon-location"></i>
-                  <span>用户管理</span>
+                  <span>{{value.title}}</span>
                 </template>
-                <el-menu-item index="users">
+                <el-menu-item
+                v-for="(value2,indexs2) in value.children"
+                :key="indexs2"
+                :index="value2.index">
                   <i class="el-icon-menu"></i>
-                  <span slot="title">用户列表</span>
+                  <span slot="title">{{value2.title}}</span>
                 </el-menu-item>
-
               </el-submenu>
-              <el-submenu index="2">
+
+              <!-- <el-submenu index="2">
                 <template slot="title">
                   <i class="el-icon-location"></i>
                   <span>权限管理</span>
@@ -84,7 +91,7 @@
                   <span slot="title">数据报表</span>
                 </el-menu-item>
 
-              </el-submenu>
+              </el-submenu> -->
             </el-menu>
           </el-col>
         </el-row>
@@ -105,8 +112,8 @@
               alt=""
               width="30px"
             >
-            <span>陈十一</span>
-            <button>退出</button>
+            <span>{{username}}</span>
+            <button @click="logout">退出</button>
           </div>
         </el-header>
         <el-main>
@@ -120,26 +127,125 @@
 </template>
 <script>
 // 获取请求用户列表的数据
-import { getUserList } from '@/api'
+import { findUserById } from '@/api'
 export default {
   data () {
     return {
-      isCollapse: false
+      // 默认选中index地址
+      defaultUrl: '',
+      isCollapse: false,
+      id: '',
+      username: '',
+      submenu: [
+        {
+          index: '1',
+          title: '用户管理',
+          children: [
+            {
+              index: 'users',
+              title: '用户列表'
+            }
+          ]
+        },
+        {
+          index: '2',
+          title: '权限管理',
+          children: [
+            {
+              index: 'roles',
+              title: '角色列表'
+            },
+            {
+              index: 'permissions',
+              title: '权限列表'
+            }
+          ]
+        },
+        {
+          index: '3',
+          title: '商品管理',
+          children: [
+            {
+              index: 'goods',
+              title: '商品列表'
+            },
+            {
+              index: '3-2',
+              title: '分类参数'
+            },
+            {
+              index: '3-3',
+              title: '商品分类'
+            }
+          ]
+        },
+        {
+          index: '4',
+          title: '订单管理',
+          children: [
+            {
+              index: '4-1',
+              title: '订单列表'
+            }
+          ]
+        },
+        {
+          index: '5',
+          title: '数据统计',
+          children: [
+            {
+              index: '5-1',
+              title: '数据报表'
+            }
+          ]
+        }
+      ]
     }
   },
   //   钩子函数---自动触发函数
   mounted () {
-    getUserList({ pagenum: 1, pagesize: 10 })
+    // 获取登录存储到本地的id
+    this.id = localStorage.getItem('admin_id')
+    // 发送请求 获取用户数据
+    findUserById(this.id).then(results => {
+      if (results.meta.status === 200) {
+        this.username = results.data.username
+      }
+    })
+    this.defaultUrl = this.$route.path.split('/')[1]
+  },
+  // 监听路由变化
+  watch: {
+    '$route': 'getPath'
   },
   methods: {
+
+    getPath () {
+      // if (this.$route.path.split('/')[1] === 'welcome') {
+      //   this.defaultUrl = this.$route.path.split('/')[1]
+      //   this.$refs['menu'].activeIndex = 'welcome'
+      //   console.log('呵呵呵' + this.defaultUrl)
+      //   console.log(this.$refs['menu'])
+      //   return
+      // }
+      this.defaultUrl = this.$route.path.split('/')[1]
+      console.log(this.defaultUrl)
+      console.log(this.$refs['menu'])
+    },
     handleOpen (key, keyPath) {
       console.log(key, keyPath)
     },
     handleClose (key, keyPath) {
       console.log(key, keyPath)
+    },
+    // 退出登录
+    logout () {
+      // 清除本地缓存
+      localStorage.clear()
+      // 编程式导航跳转登录页
+      this.$router.push({ name: 'login' })
     }
   }
-
 }
 </script>
 

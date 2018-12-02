@@ -26,11 +26,11 @@
         <el-table-column type="expand">
           <template slot-scope="props">
             <el-row
+              v-if="props.row.children.length!==0"
               :gutter="20"
               v-for="(value,index) in props.row.children"
               :key="index"
             >
-
               <el-col :span="2">
                 <div class="one">{{value.authName}}</div>
               </el-col>
@@ -50,7 +50,6 @@
                     :span="18"
                     :offset="2"
                   >
-
                     <el-col
                       :span="3"
                       v-for="(value3,index3) in value2.children"
@@ -62,7 +61,16 @@
                   </el-col>
                 </el-row>
               </el-col>
-
+            </el-row>
+            <el-row
+              v-if="props.row.children.length===0"
+              :gutter="20"
+            >
+              <el-col :span="6">
+                <div>
+                  该角色还没有分配任何的权限
+                </div>
+              </el-col>
             </el-row>
           </template>
         </el-table-column>
@@ -209,19 +217,22 @@
     </template>
 
     <!-- 授权角色 -->
-<template>
+    <template>
       <el-dialog
         title="授权角色"
         :visible.sync="authorizationdialogFormVisible"
       >
-        <el-form
-          :model="authorizationform"
-          label-width="120px"
-          ref="authorizationform"
-          :rules="rules"
-        >
-
-        </el-form>
+      <!-- tree树 -->
+        <el-tree
+            :data="data2"
+            show-checkbox
+            default-expand-all
+            node-key="id"
+            ref="tree"
+            highlight-current
+            :props="defaultProps"
+          >
+          </el-tree>
         <div
           slot="footer"
           class="dialog-footer"
@@ -242,6 +253,45 @@ import { getRoles, addRoles, editRoles, deleteRoles } from '@/api'
 export default {
   data () {
     return {
+      data2: [{
+        id: 1,
+        label: '一级 1',
+        children: [{
+          id: 4,
+          label: '二级 1-1',
+          children: [{
+            id: 9,
+            label: '三级 1-1-1'
+          }, {
+            id: 10,
+            label: '三级 1-1-2'
+          }]
+        }]
+      }, {
+        id: 2,
+        label: '一级 2',
+        children: [{
+          id: 5,
+          label: '二级 2-1'
+        }, {
+          id: 6,
+          label: '二级 2-2'
+        }]
+      }, {
+        id: 3,
+        label: '一级 3',
+        children: [{
+          id: 7,
+          label: '二级 3-1'
+        }, {
+          id: 8,
+          label: '二级 3-2'
+        }]
+      }],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      },
       // 模态框 默认不显示
       authorizationdialogFormVisible: false,
       // 添加新角色的数据
