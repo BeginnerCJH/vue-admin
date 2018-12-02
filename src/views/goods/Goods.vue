@@ -137,8 +137,8 @@ export default {
         // console.log(results)
         if (results.meta.status === 200) {
           this.goodsList = results.data.goods
-          console.log(results)
-          console.log(results.data.goods)
+          // console.log(results)
+          // console.log(results.data.goods)
           this.total = results.data.total
         }
       })

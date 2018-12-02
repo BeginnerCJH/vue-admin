@@ -221,16 +221,17 @@ export default {
   methods: {
 
     getPath () {
-      // if (this.$route.path.split('/')[1] === 'welcome') {
-      //   this.defaultUrl = this.$route.path.split('/')[1]
-      //   this.$refs['menu'].activeIndex = 'welcome'
-      //   console.log('呵呵呵' + this.defaultUrl)
-      //   console.log(this.$refs['menu'])
-      //   return
-      // }
       this.defaultUrl = this.$route.path.split('/')[1]
-      console.log(this.defaultUrl)
-      console.log(this.$refs['menu'])
+      if (this.defaultUrl === 'welcome') {
+        this.$refs['menu'].activeIndex = ''
+        for (let i = 0; i < this.submenu.length; i++) {
+          // console.log(this.submenu[i].index)
+          // 收起指定的 sub-menu参数需要收起的 sub-menu 的 index
+          this.$refs['menu'].close(this.submenu[i].index)
+        }
+      }
+      // console.log(this.defaultUrl)
+      // console.log(this.$refs['menu'])
     },
     handleOpen (key, keyPath) {
       console.log(key, keyPath)
