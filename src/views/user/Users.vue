@@ -107,7 +107,7 @@
             <el-tooltip
               class="item"
               effect="dark"
-              content="角色权限"
+              content="分配角色"
               placement="top"
             >
               <el-button
@@ -277,7 +277,7 @@
           <el-form-item label="角色">
             <el-select
               v-model="permissionform.rid"
-              placeholder="请选择权限"
+              placeholder="请选择角色"
             >
               <el-option
                 v-for="(values,index) in permission"
@@ -430,11 +430,19 @@ export default {
               this.editdialogFormVisible = false
               //  重新渲染页面
               this.init()
-              // 修改成功之后，提醒用户添加成功
+              // 修改成功之后，提醒用户成功
               this.$message({
                 message: results.meta.msg,
                 type: 'success'
               })
+            } else {
+              // 修改失败之后，提醒用户失败
+              this.$message({
+                message: results.meta.msg,
+                type: 'error'
+              })
+              // 隐藏模态框
+              this.editdialogFormVisible = false
             }
           })
         } else {
@@ -496,6 +504,8 @@ export default {
                 message: results.meta.msg,
                 type: 'error'
               })
+              //   隐藏模态框
+              this.adddialogFormVisible = false
             }
           })
         } else {
@@ -522,6 +532,12 @@ export default {
         if (results.meta.status === 200) {
           this.userList = results.data.users
           this.total = results.data.total
+        } else {
+          // 提示用户失败
+          this.$message({
+            message: results.meta.msg,
+            type: 'error'
+          })
         }
       })
     },
@@ -596,12 +612,19 @@ export default {
               if (results.data.rid === 0) {
                 this.permissionform.rid = '超级管理员'
               } else if (results.data.rid === -1) {
-
               } else {
                 this.permissionform.rid = results.data.rid
               }
             }
           })
+        } else {
+          // 提示用户添加失败
+          this.$message({
+            message: results.meta.msg,
+            type: 'error'
+          })
+          // 隐藏模态框
+          this.permissiondialogFormVisible = false
         }
       })
     },

@@ -21,77 +21,21 @@
               :router="true"
             >
               <el-submenu
-              v-for="(value,indexs) in submenu"
-              :key="indexs"
-              :index="value.index">
+              v-for="(value,index) in submenu"
+              :key="index"
+              :index="value.order.toString()">
                 <template slot="title">
                   <i class="el-icon-location"></i>
-                  <span>{{value.title}}</span>
+                  <span>{{value.authName}}</span>
                 </template>
                 <el-menu-item
-                v-for="(value2,indexs2) in value.children"
-                :key="indexs2"
-                :index="value2.index">
+                v-for="(value2,index2) in value.children"
+                :key="index2"
+                :index="'/'+value2.path">
                   <i class="el-icon-menu"></i>
-                  <span slot="title">{{value2.title}}</span>
+                  <span slot="title">{{value2.authName}}</span>
                 </el-menu-item>
               </el-submenu>
-
-              <!-- <el-submenu index="2">
-                <template slot="title">
-                  <i class="el-icon-location"></i>
-                  <span>权限管理</span>
-                </template>
-                <el-menu-item index="roles">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">角色列表</span>
-                </el-menu-item>
-                <el-menu-item index="permissions">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">权限列表</span>
-                </el-menu-item>
-              </el-submenu>
-              <el-submenu index="3">
-                <template slot="title">
-                  <i class="el-icon-location"></i>
-                  <span>商品管理</span>
-                </template>
-                <el-menu-item index="goods">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">商品列表</span>
-                </el-menu-item>
-                <el-menu-item index="3-2">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">分类参数</span>
-                </el-menu-item>
-                <el-menu-item index="3-3">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">商品分类</span>
-                </el-menu-item>
-
-              </el-submenu>
-              <el-submenu index="4">
-                <template slot="title">
-                  <i class="el-icon-location"></i>
-                  <span>订单管理</span>
-                </template>
-                <el-menu-item index="4-1">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">订单列表</span>
-                </el-menu-item>
-
-              </el-submenu>
-              <el-submenu index="5">
-                <template slot="title">
-                  <i class="el-icon-location"></i>
-                  <span>数据统计</span>
-                </template>
-                <el-menu-item index="5-1">
-                  <i class="el-icon-menu"></i>
-                  <span slot="title">数据报表</span>
-                </el-menu-item>
-
-              </el-submenu> -->
             </el-menu>
           </el-col>
         </el-row>
@@ -106,9 +50,9 @@
             <span>陈十一后台管理系统</span>
           </div>
           <div class="welcome">
-            <span>欢迎你：</span>
+            <span>欢迎你：{{$store.state.username}}</span>
             <img
-              src="../assets/aaa.png"
+              src="../assets/taiji.gif"
               alt=""
               width="30px"
             >
@@ -127,7 +71,7 @@
 </template>
 <script>
 // 获取请求用户列表的数据
-import { findUserById } from '@/api'
+import { getMenus } from '@/api'
 export default {
   data () {
     return {
@@ -137,98 +81,44 @@ export default {
       id: '',
       username: '',
       submenu: [
-        {
-          index: '1',
-          title: '用户管理',
-          children: [
-            {
-              index: 'users',
-              title: '用户列表'
-            }
-          ]
-        },
-        {
-          index: '2',
-          title: '权限管理',
-          children: [
-            {
-              index: 'roles',
-              title: '角色列表'
-            },
-            {
-              index: 'permissions',
-              title: '权限列表'
-            }
-          ]
-        },
-        {
-          index: '3',
-          title: '商品管理',
-          children: [
-            {
-              index: 'goods',
-              title: '商品列表'
-            },
-            {
-              index: '3-2',
-              title: '分类参数'
-            },
-            {
-              index: '3-3',
-              title: '商品分类'
-            }
-          ]
-        },
-        {
-          index: '4',
-          title: '订单管理',
-          children: [
-            {
-              index: '4-1',
-              title: '订单列表'
-            }
-          ]
-        },
-        {
-          index: '5',
-          title: '数据统计',
-          children: [
-            {
-              index: '5-1',
-              title: '数据报表'
-            }
-          ]
-        }
+
       ]
     }
   },
   //   钩子函数---自动触发函数
   mounted () {
-    // 获取登录存储到本地的id
-    this.id = localStorage.getItem('admin_id')
-    // 发送请求 获取用户数据
-    findUserById(this.id).then(results => {
+    // 动态请求菜单栏数据
+    getMenus().then(results => {
+      // console.log(results)
       if (results.meta.status === 200) {
-        this.username = results.data.username
+        this.submenu = results.data
       }
     })
-    this.defaultUrl = this.$route.path.split('/')[1]
+    console.log(this.$store.state)
+
+    // 默认高亮地址
+    // this.defaultUrl = this.$route.path.split('/')[1]
+    this.defaultUrl = this.$route.path
+    // 监听地址栏的路由 检测到goods/有拼接其他参数 就立刻改变高亮的指向路由
+    if (this.defaultUrl.indexOf('/goods/') !== -1) {
+      this.defaultUrl = '/goods'
+    }
   },
   // 监听路由变化
   watch: {
     '$route': 'getPath'
   },
   methods: {
-
     getPath () {
-      this.defaultUrl = this.$route.path.split('/')[1]
-      if (this.defaultUrl === 'welcome') {
+      this.defaultUrl = this.$route.path
+      // console.log('aa' + this.defaultUrl)
+      if (this.defaultUrl === '/welcome') {
         this.$refs['menu'].activeIndex = ''
-        for (let i = 0; i < this.submenu.length; i++) {
-          // console.log(this.submenu[i].index)
+        this.submenu.forEach(value => {
+          // console.log(value)
           // 收起指定的 sub-menu参数需要收起的 sub-menu 的 index
-          this.$refs['menu'].close(this.submenu[i].index)
-        }
+          this.$refs['menu'].close(`${value.order.toString()}`)
+        })
       }
       // console.log(this.defaultUrl)
       // console.log(this.$refs['menu'])
@@ -298,6 +188,7 @@ export default {
     color: white;
     img {
       vertical-align: middle;
+      border-radius: 50%
     }
   }
 }

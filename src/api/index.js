@@ -141,7 +141,17 @@ export const deleteRolesRights = (roleId, rightId) => {
     return results.data
   })
 }
-// 获取用户列表的接口----是一个常量函数 export暴露出去 供外部使用
+
+// 角色授权的接口方法----是一个常量函数 export暴露出去 供外部使用
+export const roleAuthorization = (roleId, rids) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.post(`roles/${roleId}/rights`, rids).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 获取权限列表的接口----是一个常量函数 export暴露出去 供外部使用
 export const getRightsList = (type) => {
   // 通过return可以返回一个promise对象 它里面有一个方法是.then
   return axios.get(`rights/${type}`).then(results => {
@@ -149,10 +159,88 @@ export const getRightsList = (type) => {
     return results.data
   })
 }
+
+// 左侧菜单权限的接口----是一个常量函数 export暴露出去 供外部使用
+export const getMenus = (type) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get(`menus`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
 // 获取商品列表的接口----是一个常量函数 export暴露出去 供外部使用
 export const getGoodList = (params) => {
   // 通过return可以返回一个promise对象 它里面有一个方法是.then
   return axios.get('goods', {params: params}).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 商品分类数据列表的接口----是一个常量函数 export暴露出去 供外部使用
+export const getCategories = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get('categories', {params: {'type': params}}).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+// 添加商品数据列表的接口----是一个常量函数 export暴露出去 供外部使用
+export const addGoods = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.post('goods', params).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+// 删除商品数据列表的接口----是一个常量函数 export暴露出去 供外部使用
+export const deleteGoods = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.delete(`goods/${params}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+// 根据ID查询商品的接口----是一个常量函数 export暴露出去 供外部使用
+export const getGoodsById = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get(`goods/${params}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 编辑提交商品的接口----是一个常量函数 export暴露出去 供外部使用
+export const editGoods = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.put(`goods/${params.id}`, params).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 添加分类的接口----是一个常量函数 export暴露出去 供外部使用
+export const addCategories = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.post(`categories`, params).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+// 删除分类的接口----是一个常量函数 export暴露出去 供外部使用
+export const deleteCategories = (id) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.delete(`categories/${id}`).then(results => {
+    //   通过return把结果返回到promise对象中
+    return results.data
+  })
+}
+
+// 基于类型统计（饼图）的接口----是一个常量函数 export暴露出去 供外部使用
+export const getReportsPie = (params) => {
+  // 通过return可以返回一个promise对象 它里面有一个方法是.then
+  return axios.get(`reports/${params}`).then(results => {
     //   通过return把结果返回到promise对象中
     return results.data
   })

@@ -68,8 +68,8 @@ export default {
             if (results.meta.status === 200) {
               // 登录成功的时候 实现本地存储token值
               localStorage.setItem('admin_token', results.data.token)
-              // 存储id
-              localStorage.setItem('admin_id', results.data.id)
+              // 用store存储用户名
+              this.$store.dispatch('setActions', results.data.username)
               // 跳转 编程式的导航---跳转路由
               this.$router.push({name: 'Home'})
             } else {
@@ -93,7 +93,9 @@ export default {
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: #2f4050;
+  // background-color: #2f4050;
+  // background-color: aqua;
+  background-image: linear-gradient(pink,aqua);
   .container {
     position: absolute;
     left: 0;

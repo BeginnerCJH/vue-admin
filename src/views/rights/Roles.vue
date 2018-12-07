@@ -22,11 +22,14 @@
         :data="rolesList"
         style="width: 100%"
         border
+        @expand-change="expandSelect"
+        :row-key='getRowKeys'
+          :expand-row-keys="expands"
       >
         <el-table-column type="expand">
           <template slot-scope="props">
             <el-row
-              v-if="props.row.children.length===0"
+              v-show="props.row.children.length===0"
               :gutter="20"
             >
               <el-col :span="6">
@@ -36,7 +39,6 @@
               </el-col>
             </el-row>
             <el-row
-              v-else
               :gutter="20"
               v-for="(value,index) in props.row.children"
               :key="index"
@@ -50,7 +52,10 @@
                 >
                   {{value.authName}}
                 </el-tag>
-                <span class="el-icon-arrow-right"></span>
+                <span
+                  v-if='value.children.length!==0'
+                  class="el-icon-arrow-right"
+                ></span>
 
               </el-col>
               <el-col :span="20">
@@ -68,7 +73,10 @@
                       {{value2.authName}}
 
                     </el-tag>
-                    <span class="el-icon-arrow-right"></span>
+                    <span
+                      v-if='value2.children.length!==0'
+                      class="el-icon-arrow-right"
+                    ></span>
                   </el-col>
                   <el-col :span="20">
                     <el-tag
@@ -134,7 +142,7 @@
             <el-tooltip
               class="item"
               effect="dark"
-              content="授权角色"
+              content="分配权限"
               placement="top"
             >
               <el-button
@@ -171,7 +179,10 @@
               autocomplete="off"
             ></el-input>
           </el-form-item>
-          <el-form-item label="角色描述">
+          <el-form-item
+            label="角色描述"
+            prop="roleDesc"
+          >
             <el-input
               v-model="addform.roleDesc"
               autocomplete="off"
@@ -234,9 +245,19 @@
     <!-- 授权角色 -->
     <template>
       <el-dialog
-        title="授权角色"
+        title="分配权限"
         :visible.sync="authorizationdialogFormVisible"
       >
+        <el-card
+          shadow="always"
+          style="margin:10px"
+        >
+          <span class="name">授权角色：<span style="color:#67c23a">{{roleName}}</span></span>
+          <span
+            class="desc"
+            style="margin-left:20px"
+          >主要职能：<span style="color:#f56c6c">{{roleDesc}}</span></span>
+        </el-card>
         <!-- tree树 -->
         <el-scrollbar style="height:100%">
           <el-tree
@@ -246,9 +267,8 @@
             node-key="id"
             ref="tree"
             :default-checked-keys="checkedKeys"
-            highlight-current
             :props="defaultProps"
-            style="height:500px"
+            style="height:400px"
           >
 
           </el-tree>
@@ -261,7 +281,7 @@
           <el-button @click="authorizationdialogFormVisible = false">取 消</el-button>
           <el-button
             type="primary"
-            @click="submitauthorizationform('authorizationform')"
+            @click="getCheckedNodes"
           >确 定</el-button>
         </div>
       </el-dialog>
@@ -276,15 +296,24 @@ import {
   editRoles,
   deleteRoles,
   getRightsList,
-  deleteRolesRights
+  deleteRolesRights,
+  roleAuthorization
 } from '@/api'
 export default {
   data () {
     return {
+      expands: [],
+      getRowKeys (row) {
+        return row.id
+      },
       // 角色数据
       rolesData: [],
       // 选中权限数据
       checkedKeys: [],
+      // 角色id---分批权限要使用
+      roleId: '',
+      roleName: '',
+      roleDesc: '',
       defaultProps: {
         children: 'children',
         label: 'authName'
@@ -318,11 +347,76 @@ export default {
       rules: {
         roleName: [
           { required: true, message: '请输入角色名称', trigger: 'blur' }
+        ],
+        roleDesc: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' }
         ]
       }
     }
   },
   methods: {
+    // 表格变化
+    expandSelect (row, expandedRows) {
+      // console.log(row)
+      // console.log(expandedRows)
+      var that = this
+      if (expandedRows.length) {
+        that.expands = []
+        if (row) {
+          that.expands.push(row.id)
+        }
+      } else {
+        that.expands = []
+      }
+    },
+    // 提交授权修改
+    getCheckedNodes () {
+      // console.log(this.$refs.tree.getCheckedNodes()) // 可以获取到每一个被选中的节点对象
+      // 1获取去每个被选中的对象 ---返回的结果是一个数组
+      var selectednodes = this.$refs['tree'].getCheckedNodes()
+      // console.log(selectednodes)
+      // 2把获取的数组对象遍历 拿到里面的每个id和pid 通过 连接
+      // map遍历数组 可以返回一个数组
+      var nodesArr = selectednodes.map(value => {
+        return `${value.id},${value.pid}`
+      })
+      // console.log(nodesArr)
+      // 3 返回的数据格式["105,104,101", "116,104,101"] 通过join转为连接一起的字符串 有重复值
+      var nodesStr = nodesArr.join(',')
+      // console.log(nodesStr)
+      // 4通过es6的new Set去除数组的重复值---返回的结果是一个set对象
+      var nodesSet = new Set(nodesStr.split(','))
+      // console.log(nodesSet)
+      // 5通过Array.from方法可以将Set结构转为数组。
+      var nodesNoRepeatArr = Array.from(nodesSet)
+      // console.log(nodesNoRepeatArr)
+      // 6把数据转成我们最终需要的以，分割的列表
+      var rids = nodesNoRepeatArr.join(',')
+      console.log(rids, this.roleId)
+      // 发送请求 实现角色授权
+      roleAuthorization(this.roleId, { rids: rids }).then(results => {
+        console.log(results)
+        if (results.meta.status === 200) {
+          // 隐藏模态框
+          this.authorizationdialogFormVisible = false
+          // 更新数据
+          this.init()
+          // 提示用户更新成功
+          this.$message({
+            type: 'success',
+            message: results.meta.msg
+          })
+        } else {
+          // 提示用户更新失败
+          this.$message({
+            type: 'success',
+            message: results.meta.msg
+          })
+          // 隐藏模态框
+          this.authorizationdialogFormVisible = false
+        }
+      })
+    },
     // 删除角色指定的权限
     close (row, rightId) {
       // console.log('啊 我死了' + roleId, rightId)
@@ -351,7 +445,7 @@ export default {
         if (valid) {
           //   表单输入正确 发送请求
           editRoles(this.editform).then(results => {
-            console.log(results)
+            // console.log(results)
             if (results.meta.status === 200) {
               // 提示用户修改成功
               this.$message({
@@ -367,6 +461,8 @@ export default {
                 message: results.meta.msg,
                 type: 'error'
               })
+              //   隐藏模态框
+              this.editdialogFormVisible = false
             }
           })
         } else {
@@ -392,15 +488,19 @@ export default {
                 message: results.meta.msg,
                 type: 'success'
               })
+              this.$refs[formname].resetFields()
               //   隐藏模态框
               this.adddialogFormVisible = false
               // 重新渲染数据
               this.init()
             } else {
+              // 提示用户失败
               this.$message({
                 message: results.meta.msg,
                 type: 'error'
               })
+              //   隐藏模态框
+              this.adddialogFormVisible = false
             }
           })
         } else {
@@ -415,10 +515,16 @@ export default {
     // 获取角色数据渲染
     init () {
       getRoles().then(results => {
-        console.log(results)
+        // console.log(results)
         if (results.meta.status === 200) {
           this.rolesList = results.data
           //   console.log(results.data)
+        } else {
+          // 提示用户失败
+          this.$message({
+            message: results.meta.msg,
+            type: 'error'
+          })
         }
       })
     },
@@ -471,16 +577,27 @@ export default {
     // 授权
     handleAuthorization (index, row) {
       console.log(index, row)
+      //
+      this.roleId = row.id
+      this.roleName = row.roleName
+      this.roleDesc = row.roleDesc
       //   显示模态框
       this.authorizationdialogFormVisible = true
       getRightsList('tree').then(results => {
         // console.log(results)
         if (results.meta.status === 200) {
           this.rolesData = results.data
+        } else {
+          // 提示用户失败
+          this.$message({
+            message: results.meta.msg,
+            type: 'error'
+          })
         }
       })
       // 先清除上次的id号
       this.checkedKeys.length = 0
+
       row.children.forEach(first => {
         if (first.children && first.children.length !== 0) {
           first.children.forEach(second => {

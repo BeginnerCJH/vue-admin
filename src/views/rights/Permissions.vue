@@ -12,7 +12,7 @@
       <el-table
         :data="rightsList"
         border
-        style="width: 100%"
+        style="width: 30%"
       >
         <el-table-column
           type="index"
@@ -22,20 +22,18 @@
         <el-table-column
           prop="authName"
           label="权限"
-          width="180"
         >
         </el-table-column>
         <el-table-column
           prop="path"
           label="路径"
-          width="180"
         >
         </el-table-column>
 
         <el-table-column
           prop="level"
           label="层级"
-          width="100"
+          width='80'
         >
         <!--插槽 自定义模板 -->
           <template slot-scope="scope">
@@ -62,6 +60,12 @@ export default {
       console.log(results)
       if (results.meta.status === 200) {
         this.rightsList = results.data
+      } else {
+        // 提示用户失败
+        this.$message({
+          message: results.meta.msg,
+          type: 'error'
+        })
       }
     })
   },
