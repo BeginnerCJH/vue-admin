@@ -10,6 +10,7 @@ import Goods from '@/views/goods/Goods.vue'
 import List from '@/views/goods/List.vue'
 import Add from '@/views/goods/Add.vue'
 import Categories from '@/views/goods/Categories.vue'
+import Params from '@/views/goods/Params.vue'
 import Reports from '@/views/reports/reports.vue'
 
 Vue.use(Router)
@@ -85,6 +86,12 @@ export default new Router({
           path: '/categories',
           name: 'Categories',
           component: Categories
+        },
+        // 分类参数路由
+        {
+          path: '/params',
+          name: 'Params',
+          component: Params
         },
         // 数据报表路由
         {

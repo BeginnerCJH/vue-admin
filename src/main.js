@@ -8,7 +8,6 @@ import store from './store/store'
 // 引入element
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-
 // 引入index.css
 import '@/styles/index.scss'
 
@@ -19,12 +18,36 @@ import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+// 引入地图
+import VueAMap from 'vue-amap'
 
-// 使用富文本
-Vue.use(VueQuillEditor)
 // 使用element
 Vue.use(ElementUI)
 
+// 使用富文本
+Vue.use(VueQuillEditor)
+
+// 使用vueamap
+Vue.use(VueAMap)
+
+// 初始化vueamap
+VueAMap.initAMapApiLoader({
+  // 高德的key
+  key: '6a204f2b675f32f8849ec4b6b7c21e5c',
+  // 插件集合
+  plugin: ['AMap.Autocomplete',
+    'AMap.PlaceSearch',
+    'AMap.Scale',
+    'AMap.OverView',
+    'AMap.ToolBar',
+    'AMap.MapType',
+    'AMap.PolyEditor',
+    'AMap.CircleEditor',
+    'AMap.Geolocation'
+  ],
+  // 高德 sdk 版本，默认为 1.4.4
+  v: '1.4.4'
+})
 Vue.config.productionTip = false
 
 // 导航守卫---三个参数 to到哪里去  from从哪里来 next()下一个钩子函数
@@ -36,7 +59,7 @@ router.beforeEach((to, from, next) => {
     next()
   } else {
     // 跳转回登录页
-    next({path: '/login'})
+    next({ path: '/login' })
   }
 })
 

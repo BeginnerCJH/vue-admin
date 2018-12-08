@@ -50,7 +50,7 @@
             <span>陈十一后台管理系统</span>
           </div>
           <div class="welcome">
-            <span>欢迎你：{{$store.state.username}}</span>
+            <span>欢迎你：{{$store.getters.gettersUsername}}</span>
             <img
               src="../assets/taiji.gif"
               alt=""
